@@ -66,6 +66,7 @@ class CodeRepairAgent:
             "Keep in mind that you have to keep the logic and structure in the code intact."
             "Keep the import statements intact for the code you process. "
             "Also consider edge cases like elements being repeated or for an empty being an expert in DSA make sure it is robust to edge cases as well. "
+            "Dont write '```python' or '```' anywhere in the code."
             f"\n\nCode:\n{code}"
         )
         model = genai.GenerativeModel(GEMINI_MODEL)
@@ -90,7 +91,7 @@ class CodeRepairAgent:
         return 'VALID' in response.choices[0].message.content.upper()
 
     def save_corrected_code(self, original: Path, code: str):
-        fixed_name = f"{original.stem}_fixed.py"
+        fixed_name = f"{original.stem}.py"
         out_path = self.output_dir / fixed_name
         out_path.write_text(code, encoding='utf-8')
         logging.info(f"Saved fixed code to {out_path}")

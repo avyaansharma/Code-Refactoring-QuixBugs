@@ -43,13 +43,13 @@ if __name__ == "__main__":
 
     if algo in graph_based:
         print("Correct Python:")
-        correct_module = __import__("correct_python_programs."+algo+"_test")
+        correct_module = __import__("correct_python_programs."+"test_"+algo)
         correct_fx = getattr(correct_module, algo+"_test")
         getattr(correct_fx,"main")()
         print()
 
         print("Bad Python:")
-        test_module = __import__("python_programs."+algo+"_test")
+        test_module = __import__("python_programs."+"test_"+algo)
         test_fx = getattr(test_module, algo+"_test")
         try:
             getattr(test_fx,"main")()

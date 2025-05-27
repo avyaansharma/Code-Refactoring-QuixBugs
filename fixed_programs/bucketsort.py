@@ -1,4 +1,4 @@
-```python
+
 def bucketsort(arr, k):
     counts = [0] * k
     for x in arr:
@@ -26,4 +26,3 @@ Precondition:
 Output:
     The elements of arr in sorted order
 """
-```
