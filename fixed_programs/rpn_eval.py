@@ -1,4 +1,3 @@
-
 def rpn_eval(tokens):
     def op(symbol, a, b):
         if symbol == '+':
@@ -9,30 +8,29 @@ def rpn_eval(tokens):
             return a * b
         elif symbol == '/':
             if a == 0:
-                raise ZeroDivisionError("Division by zero")
+                raise ZeroDivisionError("Cannot divide by zero")
             return b / a
         else:
-            raise ValueError("Invalid operator")
+            raise ValueError("Invalid operator: {}".format(symbol))
 
     stack = []
- 
+
     for token in tokens:
-        if isinstance(token, float):
-            stack.append(token)
+        if isinstance(token, (int, float)):
+            stack.append(float(token))
         else:
             if len(stack) < 2:
-                return "Invalid Expression"
+                raise ValueError("Not enough operands for operator: {}".format(token))
             a = stack.pop()
             b = stack.pop()
             stack.append(op(token, a, b))
 
-    if len(stack) != 1:
-        return "Invalid Expression"
+    if len(stack) == 0:
+        raise ValueError("Empty expression")
+    if len(stack) > 1:
+        raise ValueError("Too many operands")
 
     return stack.pop()
-
-
-
 """
 Reverse Polish Notation
 

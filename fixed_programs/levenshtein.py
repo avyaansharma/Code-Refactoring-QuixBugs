@@ -1,15 +1,52 @@
-
 def levenshtein(source, target):
-    if not source:
-        return len(target)
-    if not target:
-        return len(source)
+    """
+    Calculates the Levenshtein distance between two strings.
+    The Levenshtein distance is defined as the minimum amount of
+    single-character edits (either removing a character, adding a character,
+    or changing a character) necessary to transform a source string into a target string.
 
-    if source[0] == target[0]:
-        return levenshtein(source[1:], target[1:])
-    else:
-        return 1 + min(
-            levenshtein(source, target[1:]),
-            levenshtein(source[1:], target[1:]),
-            levenshtein(source[1:], target)
-        )
+    Input:
+        source: The string you begin with.
+        target: The string to transform into.
+
+    Output:
+        The Levenshtein distance between the source and target.
+
+    Example:
+        electron can be transformed into neutron by removing the e, turning the l into n, and turning the c into u.
+        >>> levenshtein(electron, neutron)
+        3
+    """
+    n = len(source)
+    m = len(target)
+
+    # Handle edge cases of empty strings
+    if n == 0:
+        return m
+    if m == 0:
+        return n
+
+    # Create a matrix to store distances
+    distance = [[0 for _ in range(m + 1)] for _ in range(n + 1)]
+
+    # Initialize the first row and column
+    for i in range(n + 1):
+        distance[i][0] = i
+    for j in range(m + 1):
+        distance[0][j] = j
+
+    # Populate the matrix
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            if source[i - 1] == target[j - 1]:
+                cost = 0
+            else:
+                cost = 1
+
+            distance[i][j] = min(
+                distance[i - 1][j] + 1,  # Deletion
+                distance[i][j - 1] + 1,  # Insertion
+                distance[i - 1][j - 1] + cost  # Substitution
+            )
+
+    return distance[n][m]

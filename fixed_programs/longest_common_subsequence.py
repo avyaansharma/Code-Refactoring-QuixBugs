@@ -1,14 +1,33 @@
 def longest_common_subsequence(a, b):
-    if not a or not b:
-        return ''
+    """
+    Longest Common Subsequence
 
-    if a[0] == b[0]:
-        return a[0] + longest_common_subsequence(a[1:], b[1:])
+    Calculates the longest subsequence common to the two input strings. (A subsequence is any sequence of letters in the same order
+    they appear in the string, possibly skipping letters in between.)
 
-    else:
-        subsequence1 = longest_common_subsequence(a, b[1:])
-        subsequence2 = longest_common_subsequence(a[1:], b)
-        if len(subsequence1) >= len(subsequence2):
-            return subsequence1
-        else:
-            return subsequence2
+    Input:
+        a: The first string to consider.
+        b: The second string to consider.
+
+    Output:
+        The longest string which is a subsequence of both strings. (If multiple subsequences of equal length exist, either is OK.)
+
+    Example:
+        >>> longest_common_subsequence('headache', 'pentadactyl')
+        'eadac'
+    """
+    n = len(a)
+    m = len(b)
+
+    # Initialize a table to store lengths of LCS for subproblems
+    dp = [["" for _ in range(m + 1)] for _ in range(n + 1)]
+
+    # Fill the table in bottom-up manner
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            if a[i - 1] == b[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + a[i - 1]
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1], key=len)
+
+    return dp[n][m]

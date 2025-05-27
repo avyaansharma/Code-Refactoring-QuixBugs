@@ -1,4 +1,21 @@
 def is_valid_parenthesization(parens):
+    """
+    Nested Parens
+    Input:
+        parens: A string of parentheses
+
+    Precondition:
+        all(paren in '()' for paren in parens)
+
+    Output:
+        Whether the parentheses are properly nested
+
+    Examples:
+        >>> is_valid_parenthesization('((()()))()')
+        True
+        >>> is_valid_parenthesization(')()(')
+        False
+    """
     depth = 0
     for paren in parens:
         if paren == '(':
@@ -8,6 +25,5 @@ def is_valid_parenthesization(parens):
             if depth < 0:
                 return False
         else:
-            return False
-
+            return False  # Invalid character
     return depth == 0

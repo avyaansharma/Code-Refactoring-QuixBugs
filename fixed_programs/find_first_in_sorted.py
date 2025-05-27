@@ -9,10 +9,27 @@ def find_first_in_sorted(arr, x):
             if mid == 0 or arr[mid - 1] != x:
                 return mid
             else:
-                hi = mid - 1
+                hi = mid - 1  # Continue searching on the left for the first occurrence
         elif x < arr[mid]:
             hi = mid - 1
         else:
             lo = mid + 1
 
     return -1
+
+"""
+Fancy Binary Search
+fancy-binsearch
+
+
+Input:
+    arr: A sorted list of ints
+    x: A value to find
+
+Output:
+    The lowest index i such that arr[i] == x, or -1 if x not in arr
+
+Example:
+    >>> find_first_in_sorted([3, 4, 5, 5, 5, 5, 6], 5)
+    2
+"""

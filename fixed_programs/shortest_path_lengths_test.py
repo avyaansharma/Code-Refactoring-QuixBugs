@@ -2,41 +2,36 @@ from collections import defaultdict
 
 def shortest_path_lengths(n, graph):
     """
-    Finds the shortest path lengths between all pairs of nodes in a graph.
-
-    Args:
-        n (int): The number of nodes in the graph.
-        graph (dict): A dictionary representing the graph where keys are tuples
-                      of (node1, node2) representing an edge and values are the
-                      edge weights.
-
-    Returns:
-        dict: A dictionary where keys are tuples of (node1, node2) and values
-              are the shortest path lengths between those nodes.  If no path
-              exists, the value is float('inf').
+    Given a graph, return a dictionary of shortest path lengths between each pair of nodes.
     """
-
-    dist = defaultdict(lambda: defaultdict(lambda: float('inf')))
+    dist = defaultdict(lambda: float('inf'))
 
     # Initialize distances
     for i in range(n):
-        dist[i][i] = 0
+        dist[(i, i)] = 0
     for (u, v), weight in graph.items():
-        dist[u][v] = weight
+        dist[(u, v)] = weight
 
     # Floyd-Warshall algorithm
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+                dist[(i, j)] = min(dist[(i, j)], dist[(i, k)] + dist[(k, j)])
 
-    # Convert to desired output format
+    # Check for negative cycles
+    for i in range(n):
+        if dist[(i, i)] < 0:
+            return "Graph contains a negative cycle"
+    
+    # Filter out infinite distances for disconnected nodes.
     result = {}
     for i in range(n):
         for j in range(n):
-            result[(i, j)] = dist[i][j]
+            if dist[(i, j)] != float('inf'):
+                result[(i, j)] = dist[(i, j)]
 
     return result
+
 
 """
 Test shortest path lengths

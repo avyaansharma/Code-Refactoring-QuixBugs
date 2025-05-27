@@ -2,48 +2,50 @@ from collections import defaultdict
 
 def minimum_spanning_tree(graph):
     """
-    Finds a minimum spanning tree in a graph.
+    Finds the minimum spanning tree of a graph using Kruskal's algorithm.
 
     Args:
-        graph: A dict of the form { (u, v): w, ... } where (u, v) is an edge
-            between u and v and w is the weight of that edge.
-            Ensure the graph is undirected by representing each edge in both directions if necessary.
-            If the graph is empty or contains no edges, it returns an empty list.
+        graph: A dictionary where keys are tuples representing edges (u, v)
+               and values are the corresponding edge weights.
+
     Returns:
-        A set of edges in the minimum spanning tree.
-        Returns an empty set if the graph is empty.
+        A set of tuples representing the edges in the minimum spanning tree.
     """
-    if not graph:
-        return set()
-
-    nodes = set()
-    for edge in graph:
-        u, v = edge
-        nodes.add(u)
-        nodes.add(v)
-
-    if not nodes:
-      return set()
 
     mst = set()
-    edges = sorted(graph.items(), key=lambda item: item[1])  # Sort edges by weight
+    parent = {}
+    rank = {}
 
-    parent = {node: node for node in nodes}  # Initialize parent for each node (Disjoint Set)
+    def find(i):
+        if parent[i] == i:
+            return i
+        parent[i] = find(parent[i])
+        return parent[i]
 
-    def find(node):
-        """Find the set that a node belongs to (with path compression)."""
-        if parent[node] != node:
-            parent[node] = find(parent[node])  # Path compression
-        return parent[node]
-
-    def union(node1, node2):
-        """Merge the sets that node1 and node2 belong to."""
-        root1 = find(node1)
-        root2 = find(node2)
-        if root1 != root2:
-            parent[root1] = root2
+    def union(i, j):
+        root_i = find(i)
+        root_j = find(j)
+        if root_i != root_j:
+            if rank[root_i] < rank[root_j]:
+                parent[root_i] = root_j
+            elif rank[root_i] > rank[root_j]:
+                parent[root_j] = root_i
+            else:
+                parent[root_j] = root_i
+                rank[root_i] += 1
             return True
         return False
+
+    edges = sorted(graph.items(), key=lambda item: item[1])
+
+    vertices = set()
+    for edge in graph:
+        vertices.add(edge[0])
+        vertices.add(edge[1])
+
+    for vertex in vertices:
+        parent[vertex] = vertex
+        rank[vertex] = 0
 
     for edge, weight in edges:
         u, v = edge
@@ -51,6 +53,7 @@ def minimum_spanning_tree(graph):
             mst.add(edge)
 
     return mst
+
 """
 Driver to test minimum spanning tree
 """
@@ -96,3 +99,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+```

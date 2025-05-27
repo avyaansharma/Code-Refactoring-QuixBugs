@@ -1,30 +1,34 @@
 def sqrt(x, epsilon):
-    if x < 0:
-        return float('nan')  # Or raise an exception, depending on desired behavior
-    if x == 0:
-        return 0.0
-    approx = x / 2.0
-    while abs(approx * approx - x) > epsilon:
-        approx = 0.5 * (approx + x / approx)
-    return approx
+    """
+    Square Root
 
-"""
-Square Root
-
-Newton-Raphson method implementation.
+    Newton-Raphson method implementation.
 
 
-Input:
-    x: A float
-    epsilon: A float
+    Input:
+        x: A float
+        epsilon: A float
  
-Precondition:
-    x >= 1 and epsilon > 0
+    Precondition:
+        x >= 0 and epsilon > 0
 
-Output:
-    A float in the interval [sqrt(x) - epsilon, sqrt(x) + epsilon]
+    Output:
+        A float in the interval [sqrt(x) - epsilon, sqrt(x) + epsilon]
 
-Example:
-    >>> sqrt(2, 0.01)
-    1.4166666666666665
-"""
+    Example:
+        >>> sqrt(2, 0.01)
+        1.4166666666666665
+    """
+    if x < 0:
+        raise ValueError("Cannot compute square root of a negative number.")
+    if epsilon <= 0:
+        raise ValueError("Epsilon must be positive.")
+    if x == 0:
+        return 0.0  # Handle the case of x=0
+
+    approx = x / 2.0  # Initial guess
+    while True:
+        next_approx = 0.5 * (approx + x / approx)
+        if abs(approx - next_approx) < epsilon:
+            return next_approx
+        approx = next_approx

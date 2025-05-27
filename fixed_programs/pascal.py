@@ -1,19 +1,18 @@
-
 def pascal(n):
+    if not isinstance(n, int) or n <= 0:
+        return []  # Handle invalid input
+
     rows = [[1]]
     for r in range(1, n):
-        row = []
-        row.append(1)
+        row = [1]  # First element is always 1
         for c in range(1, r):
             upleft = rows[r - 1][c - 1]
             upright = rows[r - 1][c]
             row.append(upleft + upright)
-        row.append(1)
+        row.append(1)  # Last element is always 1
         rows.append(row)
 
     return rows
-
-
 """
 Pascal's Triangle
 pascal

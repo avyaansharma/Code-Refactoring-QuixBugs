@@ -1,4 +1,13 @@
 def mergesort(arr):
+    """
+    Merge Sort
+
+    Input:
+        arr: A list of ints
+
+    Output:
+        The elements of arr in sorted order
+    """
     def merge(left, right):
         result = []
         i = 0
@@ -14,7 +23,9 @@ def mergesort(arr):
         result.extend(right[j:])
         return result
 
-    if len(arr) <= 1:
+    if not arr:
+        return []
+    if len(arr) == 1:
         return arr
     else:
         middle = len(arr) // 2

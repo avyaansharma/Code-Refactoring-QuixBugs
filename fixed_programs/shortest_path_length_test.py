@@ -1,45 +1,55 @@
-
-from collections import deque
-import sys
+from collections import defaultdict
+import heapq
 
 class Node:
-    def __init__(self, name, value=None, children=None):
-        self.name = name
-        self.value = value
-        self.children = children if children is not None else []
+    def __init__(self, val, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
 
-def shortest_path_length(length_by_edge, start_node, end_node):
+    def __repr__(self):
+        return f"Node({self.val})"
+
+def shortest_path_length(length_by_edge, start, end):
     """
-    Calculate the shortest path length between two nodes in a graph.
+    Find the shortest path length between two nodes in a graph.
 
     Args:
-        length_by_edge (dict): A dictionary representing the graph where keys are tuples of nodes (u, v)
-                                and values are the edge lengths.
-        start_node (Node): The starting node.
-        end_node (Node): The destination node.
+        length_by_edge (dict): A dictionary where keys are tuples of nodes
+                              representing edges and values are the lengths of
+                              the edges.
+        start (Node): The starting node.
+        end (Node): The ending node.
 
     Returns:
-        int: The shortest path length between the start and end nodes. Returns sys.maxsize if no path exists.
+        int: The shortest path length between the start and end nodes.
+             Returns float('inf') if no path exists.
     """
 
-    if start_node is end_node:
-        return 0
+    graph = defaultdict(list)
+    for (u, v), weight in length_by_edge.items():
+        graph[u].append((v, weight))
 
-    distances = {start_node: 0}
-    queue = deque([start_node])
+    distances = {node: float('inf') for node in graph}
+    distances[start] = 0
 
-    while queue:
-        current_node = queue.popleft()
+    pq = [(0, start)]  # Priority queue: (distance, node)
 
-        for (u, v), length in length_by_edge.items():
-            if u is current_node and v not in distances:
-                distances[v] = distances[u] + length
-                queue.append(v)
-            elif v is current_node and u not in distances:
-                 distances[u] = distances[v] + length
-                 queue.append(u)
+    while pq:
+        dist, u = heapq.heappop(pq)
 
-    return distances.get(end_node, sys.maxsize)
+        if dist > distances[u]:
+            continue
+
+        if u == end:
+            return dist
+
+        for v, weight in graph[u]:
+            if distances[v] > distances[u] + weight:
+                distances[v] = distances[u] + weight
+                heapq.heappush(pq, (distances[v], v))
+
+    return float('inf')
 
 
 def main():

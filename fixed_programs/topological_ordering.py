@@ -4,6 +4,7 @@ def topological_ordering(nodes):
     in_degree = {}
     for node in nodes:
         in_degree[node] = 0
+
     for node in nodes:
         for neighbor in node.outgoing_nodes:
             in_degree[neighbor] += 1
@@ -21,6 +22,6 @@ def topological_ordering(nodes):
                 queue.append(neighbor)
 
     if len(ordered_nodes) != len(nodes):
-        return []
+        return None 
 
     return ordered_nodes

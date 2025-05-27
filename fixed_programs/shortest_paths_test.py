@@ -1,28 +1,38 @@
-
 from collections import defaultdict
 import heapq
 
 def shortest_paths(start, graph):
-    distances = {node: float('inf') for edge in graph for node in edge}
+    """
+    Finds the shortest paths from a starting node to all other nodes in a graph.
+
+    Args:
+        start: The starting node.
+        graph: A dictionary representing the graph where keys are tuples of (node1, node2)
+               representing an edge, and values are the weights of the edges.
+
+    Returns:
+        A dictionary where keys are nodes and values are the shortest distances from the
+        starting node to that node.
+    """
+
+    distances = defaultdict(lambda: float('inf'))
     distances[start] = 0
-    pq = [(0, start)]
+    pq = [(0, start)]  # Priority queue of (distance, node)
 
     while pq:
         dist, u = heapq.heappop(pq)
 
         if dist > distances[u]:
-            continue
+            continue  # Skip if we've already found a shorter path to u
 
         for edge, weight in graph.items():
             if edge[0] == u:
                 v = edge[1]
-                if distances[u] + weight < distances[v]:
+                if distances[v] > distances[u] + weight:
                     distances[v] = distances[u] + weight
                     heapq.heappush(pq, (distances[v], v))
 
     return distances
-
-
 """
 Test shortest paths
 """ 
@@ -40,7 +50,7 @@ def main():
         ('E', 'F'): -1
     }
     result =  shortest_paths('A', graph)
-    for path in sorted(result.keys()):
+    for path in result:
         print(path, result[path], end=" ")
     print()
 
@@ -54,7 +64,7 @@ def main():
         ('E', 'F'): 4
     }
     result =  shortest_paths('A', graph2)
-    for path in sorted(result.keys()):
+    for path in result:
         print(path, result[path], end=" ")
     print()
 
@@ -69,7 +79,7 @@ def main():
         ('E', 'F'): 4
     }
     result =  shortest_paths('A', graph3)
-    for path in sorted(result.keys()):
+    for path in result:
         print(path, result[path], end=" ")
     print()
 

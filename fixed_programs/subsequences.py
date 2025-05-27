@@ -1,4 +1,3 @@
-
 def subsequences(a, b, k):
     if k == 0:
         return [[]]
@@ -6,11 +5,13 @@ def subsequences(a, b, k):
         return []
 
     ret = []
-    for i in range(a, b + 2 - k):
-        rest_subsequences = subsequences(i + 1, b, k - 1)
-        for rest in rest_subsequences:
-            ret.append([i] + rest)
-
+    for i in range(a, b + 1):
+        remaining_elements = b - i + 1
+        if k <= remaining_elements:
+            
+            sub_subsequences = subsequences(i + 1, b, k - 1)
+            for sub_subsequence in sub_subsequences:
+                ret.append([i] + sub_subsequence)
     return ret
 
 

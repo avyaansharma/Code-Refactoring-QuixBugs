@@ -1,11 +1,9 @@
-```python
+
 def shortest_paths(source, weight_by_edge):
     nodes = set()
     for (u, v) in weight_by_edge:
         nodes.add(u)
         nodes.add(v)
-    nodes.add(source)
-
     weight_by_node = {
         v: float('inf') for v in nodes
     }
@@ -17,4 +15,3 @@ def shortest_paths(source, weight_by_edge):
                 weight_by_node[v] = weight_by_node[u] + weight
 
     return weight_by_node
-```

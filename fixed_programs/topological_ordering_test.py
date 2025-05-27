@@ -1,54 +1,5 @@
-
-from collections import deque
-
-class Node:
-    def __init__(self, value):
-        self.value = value
-        self.outgoing_nodes = []
-        self.incoming_nodes = []
-
-def topological_ordering(nodes):
-    """
-    Performs a topological sort on a directed acyclic graph (DAG).
-
-    Args:
-        nodes: A list of Node objects representing the graph's nodes.
-
-    Returns:
-        A list of Node objects in topological order.  Returns an empty list
-        if the input is empty or if the graph contains a cycle.
-    """
-
-    if not nodes:
-        return []
-
-    # Calculate in-degrees for each node
-    in_degree = {}
-    for node in nodes:
-        in_degree[node] = 0
-    for node in nodes:
-        for neighbor in node.outgoing_nodes:
-            in_degree[neighbor] = in_degree.get(neighbor, 0) + 1
-
-    # Enqueue nodes with in-degree 0
-    queue = deque([node for node in nodes if in_degree[node] == 0])
-
-    # Perform topological sort
-    result = []
-    while queue:
-        node = queue.popleft()
-        result.append(node)
-
-        for neighbor in node.outgoing_nodes:
-            in_degree[neighbor] -= 1
-            if in_degree[neighbor] == 0:
-                queue.append(neighbor)
-
-    # Check for cycles
-    if len(result) != len(nodes):
-        return []  # Cycle detected
-
-    return result
+from .node import Node
+from .topological_ordering import topological_ordering
 
 
 """
@@ -68,24 +19,19 @@ def main():
     ten = Node(10)
  
     five.outgoing_nodes = [eleven]
-    eleven.incoming_nodes.append(five)
     seven.outgoing_nodes = [eleven, eight]
-    eleven.incoming_nodes.append(seven)
-    eight.incoming_nodes.append(seven)
     three.outgoing_nodes = [eight, ten]
-    eight.incoming_nodes.append(three)
-    ten.incoming_nodes.append(three)
-    
+    eleven.incoming_nodes = [five, seven]
     eleven.outgoing_nodes = [two, nine, ten]
-    two.incoming_nodes.append(eleven)
-    nine.incoming_nodes.append(eleven)
-    ten.incoming_nodes.append(eleven)
+    eight.incoming_nodes = [seven, three]
     eight.outgoing_nodes = [nine]
-    nine.incoming_nodes.append(eight)
-    
+    two.incoming_nodes = [eleven]
+    nine.incoming_nodes = [eleven, eight]
+    ten.incoming_nodes = [eleven, three]
 
     try:
-        [print(x.value, end=" ") for x in topological_ordering([five, seven, three, eleven, eight, two, nine, ten])]
+        for x in topological_ordering([five, seven, three, eleven, eight, two, nine, ten]):
+            print(x.value, end=" ")
     except Exception as e:
         print(e)
     print()
@@ -102,20 +48,17 @@ def main():
     three = Node(3)
 
     five.outgoing_nodes = [two, zero]
-    two.incoming_nodes.append(five)
-    zero.incoming_nodes.append(five)
     four.outgoing_nodes = [zero, one]
-    zero.incoming_nodes.append(four)
-    one.incoming_nodes.append(four)
-    
+    two.incoming_nodes = [five]
     two.outgoing_nodes = [three]
-    three.incoming_nodes.append(two)
-    
+    zero.incoming_nodes = [five, four]
+    one.incoming_nodes = [four, three]
+    three.incoming_nodes = [two]
     three.outgoing_nodes = [one]
-    one.incoming_nodes.append(three)
 
     try:
-        [print(x.value, end=" ") for x in topological_ordering([five,zero, four, one, two, three])]
+        for x in topological_ordering([zero, one, two, three, four, five]):
+            print(x.value, end=" ")
     except Exception as e:
         print(e)
     print()
@@ -135,25 +78,22 @@ def main():
     eat = Node("eat")
 
     milk.outgoing_nodes = [mix]
-    mix.incoming_nodes.append(milk)
     egg.outgoing_nodes = [mix]
-    mix.incoming_nodes.append(egg)
     oil.outgoing_nodes = [mix]
-    mix.incoming_nodes.append(oil)
+    mix.incoming_nodes = [milk, egg, oil]
     mix.outgoing_nodes = [syrup, pour]
-    syrup.incoming_nodes.append(mix)
-    pour.incoming_nodes.append(mix)
     griddle.outgoing_nodes = [pour]
-    pour.incoming_nodes.append(griddle)
+    pour.incoming_nodes = [mix, griddle]
     pour.outgoing_nodes = [turn]
-    turn.incoming_nodes.append(pour)
+    turn.incoming_nodes = [pour]
     turn.outgoing_nodes = [eat]
-    eat.incoming_nodes.append(turn)
+    syrup.incoming_nodes = [mix]
     syrup.outgoing_nodes = [eat]
-    eat.incoming_nodes.append(syrup)
+    eat.incoming_nodes = [syrup, turn]
 
     try:
-        [print(x.value, end=" ") for x in topological_ordering([milk, egg, oil, mix, syrup, griddle, pour, turn, eat])]
+        for x in topological_ordering([milk, egg, oil, mix, syrup, griddle, pour, turn, eat]):
+            print(x.value, end=" ")
     except Exception as e:
         print(e)
     print()

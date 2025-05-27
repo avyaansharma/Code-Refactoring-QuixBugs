@@ -1,6 +1,8 @@
-
 def knapsack(capacity, items):
     from collections import defaultdict
+
+    if capacity <= 0 or not items:
+        return 0
 
     memo = defaultdict(int)
 
@@ -10,7 +12,7 @@ def knapsack(capacity, items):
                 memo[i, j] = 0
             else:
                 weight, value = items[i - 1]
-                memo[i, j] = memo[i - 1, j]
+                memo[i, j] = memo[i - 1, j]  # Not taking the current item
 
                 if weight <= j:
                     memo[i, j] = max(
