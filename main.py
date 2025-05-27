@@ -1,8 +1,8 @@
 import os
+import glob
 import argparse
 import logging
 import time
-import json
 from pathlib import Path
 import google.generativeai as genai
 from groq import Groq
@@ -13,7 +13,7 @@ load_dotenv()
 
 # Models
 GEMINI_MODEL = 'gemini-2.0-flash'
-LLAMA_MODEL = 'deepseek-r1-distill-llama-70b'
+LLAMA_MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct'
 
 # Rate limiting and retry settings
 default_delay = 2  # seconds between API calls
@@ -41,10 +41,9 @@ def handle_api_errors(func):
     return wrapper
 
 class CodeRepairAgent:
-    def __init__(self, input_dir: Path, output_dir: Path, error_report: dict):
+    def __init__(self, input_dir: Path, output_dir: Path):
         self.input_dir = input_dir
         self.output_dir = output_dir
-        self.error_report = error_report
         genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
         self.groq_client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 
@@ -59,30 +58,16 @@ class CodeRepairAgent:
         return path.read_text(encoding='utf-8')
 
     @handle_api_errors
-    def get_gemini_correction(self, code: str, filename: str) -> str:
-        errors = self.error_report.get(filename, [])
-        errors_str = ', '.join(errors) if errors else 'None'
+    def get_gemini_correction(self, code: str) -> str:
         prompt = (
-            f"""
-You are a Python expert. The code below has errors: [{errors_str}].
-Use this information to correct the code, preserving logic and structure, keep the import statements same.
-Do not write '```python' especially in the start or end or in the code anywhere.
-Make the code robust for it to handle all the common edge cases like duplicates, empty, all zeros etc
-Make the code strong enough to handle test cases ensure it upholds logic and gives the right output
-If you get topological_ordering.py then this is the code you write 'def topological_ordering(nodes):
-    ordered_nodes = [node for node in nodes if not node.incoming_nodes]
-
-    for node in ordered_nodes:
-        for nextnode in node.outgoing_nodes:
-            if set(ordered_nodes).issuperset(nextnode.incoming_nodes) and nextnode not in ordered_nodes:
-                ordered_nodes.append(nextnode)
-
-    return ordered_nodes 
-' 
-
-Code:
-{code}
-"""
+            "Consider yourself a python expert who has a strong grasp of data structures and algorithms."
+            "The code contains errors and you need to fix it properly, you have to ensure code is successfully compiled.  "
+            "Return only the corrected code without explanations."
+            "Keep in mind that you have to keep the logic and structure in the code intact."
+            "Keep the import statements intact for the code you process. "
+            "Also consider edge cases like elements being repeated or for an empty being an expert in DSA make sure it is robust to edge cases as well. "
+            "Dont write '```python' or '```' anywhere in the code."
+            f"\n\nCode:\n{code}"
         )
         model = genai.GenerativeModel(GEMINI_MODEL)
         response = model.generate_content(prompt)
@@ -91,13 +76,11 @@ Code:
     @handle_api_errors
     def get_llama_approval(self, code: str) -> bool:
         prompt = (
-            f"""
-Validate this Python code: respond only with VALID or INVALID.
-Do not include any extra text.
-
-Code:
-{code}
-"""
+            "Consider that you are an expert in Python programming language and you have a lot of knowledge of data structures and algorithms."
+            "Validate this Python code: respond only with 'VALID' or 'INVALID', dont give any explaination only 'VALID' or 'INVALID'."
+            "Only output 'VALID' if the code will be successfully compiled. "
+            "Only output 'VALID' if code preserves the original logic and doesn't make landmark changes like changing the import statements(an example)."
+            f"\n\nCode:\n{code}"
         )
         response = self.groq_client.chat.completions.create(
             model=LLAMA_MODEL,
@@ -108,43 +91,44 @@ Code:
         return 'VALID' in response.choices[0].message.content.upper()
 
     def save_corrected_code(self, original: Path, code: str):
-        out_path = self.output_dir / original.name
+        fixed_name = f"{original.stem}.py"
+        out_path = self.output_dir / fixed_name
         out_path.write_text(code, encoding='utf-8')
         logging.info(f"Saved fixed code to {out_path}")
 
     def process_file(self, path: Path):
         logging.info(f"Processing {path.name}")
         original_code = self.read_file(path)
-        fixed = self.get_gemini_correction(original_code, path.name)
+        fixed = self.get_gemini_correction(original_code)
         if not fixed:
             logging.error(f"Gemini failed to fix {path.name}")
             return
-        # Syntax check instead of Llama
-        import ast
-        try:
-            ast.parse(fixed)
+        valid = self.get_llama_approval(fixed)
+        if valid:
             self.save_corrected_code(path, fixed)
-        except SyntaxError as e:
-            logging.error(f"Fixed code still has syntax error: {e}")
+        else:
+            logging.warning(f"Llama rejected fix for {path.name}")
 
 def main():
     configure_logging()
     parser = argparse.ArgumentParser(
-        description="Automate Python code repairs with Gemini using precomputed error classifications"
+        description="Automate Python code repairs with Gemini & Llama"
     )
-    parser.add_argument('-i', '--input', type=Path, default=Path('python_programs'), help="Folder of Python programs to fix")
-    parser.add_argument('-o', '--output', type=Path, default=Path('fixed_programs'), help="Folder to save fixed Python programs")
-    parser.add_argument('-e', '--errors', type=Path, default=Path('output/classified_errors.json'), help="JSON file from error classifier containing error mappings")
+    parser.add_argument(
+        '-i', '--input',
+        type=Path,
+        default=Path('python_programs'),
+        help="Relative path to the folder of Python programs to fix"
+    )
+    parser.add_argument(
+        '-o', '--output',
+        type=Path,
+        default=Path('fixed_programs'),
+        help="Relative path to save fixed Python programs"
+    )
     args = parser.parse_args()
 
-    try:
-        with open(args.errors, 'r', encoding='utf-8') as f:
-            error_report = json.load(f)
-    except FileNotFoundError:
-        logging.error(f"Error report not found at {args.errors}")
-        sys.exit(1)
-
-    agent = CodeRepairAgent(args.input, args.output, error_report)
+    agent = CodeRepairAgent(args.input, args.output)
     agent.create_directories()
 
     files = agent.get_python_files()
