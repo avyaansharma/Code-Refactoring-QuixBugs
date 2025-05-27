@@ -1,6 +1,8 @@
 def bitcount(n):
     """
     Bitcount
+    bitcount
+
 
     Input:
         n: a nonnegative int
@@ -14,13 +16,11 @@ def bitcount(n):
         >>> bitcount(128)
         1
     """
-    if not isinstance(n, int):
-        raise TypeError("Input must be an integer.")
-    if n < 0:
-        raise ValueError("Input must be a non-negative integer.")
-
     count = 0
-    while n > 0:
-        n &= (n - 1)  # Efficiently clear the least significant bit
+    if not isinstance(n, int) or n < 0:
+        return 0  # Handle invalid input: non-integer or negative
+
+    while n:
         count += 1
+        n &= (n - 1)  # Efficiently clear the least significant set bit
     return count

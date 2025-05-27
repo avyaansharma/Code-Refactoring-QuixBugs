@@ -1,27 +1,37 @@
-import collections
-
 def topological_ordering(nodes):
-    in_degree = {}
-    for node in nodes:
-        in_degree[node] = 0
-
-    for node in nodes:
-        for neighbor in node.outgoing_nodes:
-            in_degree[neighbor] += 1
-
-    queue = collections.deque([node for node in nodes if in_degree[node] == 0])
     ordered_nodes = []
+    visited = set()
+    recursion_stack = set()
 
-    while queue:
-        node = queue.popleft()
-        ordered_nodes.append(node)
+    def visit(node):
+        if node in recursion_stack:
+            raise ValueError("Cycle detected")
+        if node in visited:
+            return
 
-        for neighbor in node.outgoing_nodes:
-            in_degree[neighbor] -= 1
-            if in_degree[neighbor] == 0:
-                queue.append(neighbor)
+        visited.add(node)
+        recursion_stack.add(node)
 
-    if len(ordered_nodes) != len(nodes):
-        return None 
+        for next_node in node.outgoing_nodes:
+            visit(next_node)
+
+        recursion_stack.remove(node)
+        ordered_nodes.insert(0, node)  # Prepend to build reverse topological order
+
+    for node in nodes:
+        if node not in visited:
+            visit(node)
 
     return ordered_nodes
+"""
+Topological Sort
+
+Input:
+    nodes: A list of directed graph nodes
+ 
+Precondition:
+    The input graph is acyclic
+
+Output:
+    An OrderedSet containing the elements of nodes in an order that puts each node before all the nodes it has edges to
+"""

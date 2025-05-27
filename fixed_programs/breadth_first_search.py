@@ -11,27 +11,24 @@ def breadth_first_search(startnode, goalnode):
     Output:
         Whether goalnode is reachable from startnode
     """
-    if startnode is None or goalnode is None:
+    if not startnode or not goalnode:
         return False
-
+    
     queue = Queue()
     queue.append(startnode)
 
-    nodes_seen = set()
-    nodes_seen.add(startnode)
+    nodesseen = set()
+    nodesseen.add(startnode)
 
     while queue:
         node = queue.popleft()
 
-        if node == goalnode:
+        if node is goalnode:
             return True
-        
-        if hasattr(node, 'successors'): #Check if the node has successors attribute
-            successors = node.successors
-            if successors:
-                for successor in successors:
-                    if successor not in nodes_seen:
-                        queue.append(successor)
-                        nodes_seen.add(successor)
-        
+        else:
+            if hasattr(node, 'successors'):
+                successors = [successor for successor in node.successors if successor not in nodesseen]
+                queue.extend(successors)
+                nodesseen.update(successors)
+
     return False

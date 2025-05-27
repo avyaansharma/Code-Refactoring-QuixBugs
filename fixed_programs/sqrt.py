@@ -8,7 +8,7 @@ def sqrt(x, epsilon):
     Input:
         x: A float
         epsilon: A float
- 
+
     Precondition:
         x >= 0 and epsilon > 0
 
@@ -20,11 +20,12 @@ def sqrt(x, epsilon):
         1.4166666666666665
     """
     if x < 0:
-        raise ValueError("Cannot compute square root of a negative number.")
+        raise ValueError("Cannot calculate square root of a negative number.")
     if epsilon <= 0:
-        raise ValueError("Epsilon must be positive.")
+        raise ValueError("Epsilon must be greater than zero.")
+
     if x == 0:
-        return 0.0  # Handle the case of x=0
+        return 0.0
 
     approx = x / 2.0  # Initial guess
     while True:

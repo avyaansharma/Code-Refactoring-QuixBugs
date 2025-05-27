@@ -20,12 +20,10 @@ def mergesort(arr):
                 result.append(right[j])
                 j += 1
         result.extend(left[i:])
-        result.extend(right[j:])
+        result.extend(right[j:])  # Corrected: Extend with remaining elements
         return result
 
-    if not arr:
-        return []
-    if len(arr) == 1:
+    if len(arr) <= 1:  # Corrected base case for empty or single-element array
         return arr
     else:
         middle = len(arr) // 2

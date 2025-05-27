@@ -16,13 +16,14 @@ def longest_common_subsequence(a, b):
         >>> longest_common_subsequence('headache', 'pentadactyl')
         'eadac'
     """
+    
     n = len(a)
     m = len(b)
 
-    # Initialize a table to store lengths of LCS for subproblems
+    # Initialize a matrix to store lengths of LCS for subproblems
     dp = [["" for _ in range(m + 1)] for _ in range(n + 1)]
 
-    # Fill the table in bottom-up manner
+    # Build the dp table in bottom-up manner
     for i in range(1, n + 1):
         for j in range(1, m + 1):
             if a[i - 1] == b[j - 1]:

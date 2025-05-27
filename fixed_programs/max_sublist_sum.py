@@ -6,7 +6,6 @@ def max_sublist_sum(arr):
 
     Algorithm source: WordAligned.org by Thomas Guest
 
-
     Input:
         arr: A list of ints
 
@@ -17,19 +16,27 @@ def max_sublist_sum(arr):
         >>> max_sublist_sum([4, -5, 2, 1, -1, 3])
         5
     """
-    if not arr:
-        return 0  # Handle empty list case
-
     max_ending_here = 0
-    max_so_far = float('-inf')  # Initialize to negative infinity to handle all negative numbers
+    max_so_far = 0
+
+    if not arr:
+        return 0
+
+    all_negative = True
+    max_element = float('-inf')
+
+    for x in arr:
+        if x > 0:
+            all_negative = False
+        max_element = max(max_element, x)
+        
+    if all_negative:
+        return max_element
 
     for x in arr:
         max_ending_here = max_ending_here + x
         if max_ending_here < 0:
-            max_ending_here = 0  # Reset if current sum is negative
+            max_ending_here = 0
         max_so_far = max(max_so_far, max_ending_here)
-
-    if max_so_far == 0 and all(x <= 0 for x in arr):  # Handle all negative or zero case
-        return max(arr) # Return the least negative number or 0 if all are 0
 
     return max_so_far
