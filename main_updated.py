@@ -69,16 +69,7 @@ Use this information to correct the code, preserving logic and structure, keep t
 Do not write '```python' especially in the start or end or in the code anywhere.
 Make the code robust for it to handle all the common edge cases like duplicates, empty, all zeros etc
 Make the code strong enough to handle test cases ensure it upholds logic and gives the right output
-If you get topological_ordering.py then this is the code you write 'def topological_ordering(nodes):
-    ordered_nodes = [node for node in nodes if not node.incoming_nodes]
-
-    for node in ordered_nodes:
-        for nextnode in node.outgoing_nodes:
-            if set(ordered_nodes).issuperset(nextnode.incoming_nodes) and nextnode not in ordered_nodes:
-                ordered_nodes.append(nextnode)
-
-    return ordered_nodes 
-' 
+ 
 
 Code:
 {code}
