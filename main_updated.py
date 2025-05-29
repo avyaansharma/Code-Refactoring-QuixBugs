@@ -31,6 +31,37 @@ def configure_logging():
 def handle_api_errors(func):
     def wrapper(*args, **kwargs):
         for attempt in range(1, max_retries + 1):
+import os
+import argparse
+import logging
+import time
+import json
+from pathlib import Path
+import google.generativeai as genai
+from groq import Groq
+from dotenv import load_dotenv
+load_dotenv()
+
+# Models
+GEMINI_MODEL = 'gemini-2.0-flash'
+LLAMA_MODEL = 'deepseek-r1-distill-llama-70b'
+
+# Rate limiting and retry settings
+default_delay = 2  # seconds between API calls
+max_retries = 3
+
+# Configure logging
+def configure_logging():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+# Decorator for API error handling and retries
+def handle_api_errors(func):
+    def wrapper(*args, **kwargs):
+        for attempt in range(1, max_retries + 1):
             try:
                 time.sleep(default_delay)
                 return func(*args, **kwargs)
@@ -64,12 +95,14 @@ class CodeRepairAgent:
         errors_str = ', '.join(errors) if errors else 'None'
         prompt = (
             f"""
-You are a Python expert. The code below has errors: [{errors_str}].
-Use this information to correct the code, preserving logic and structure, keep the import statements same.
+You are a Python expert. The code below has errors: [{errors_str}], try to fix them by changing a single line in the code
+The code has single line defects don't change the entire code structure, process the errors that you receieved and try to fix them without changing the entire code structure
+Use this information to correct the code, preserving logic and structure.
 Do not write '```python' especially in the start or end or in the code anywhere.
 Make the code robust for it to handle all the common edge cases like duplicates, empty, all zeros etc
-Make the code strong enough to handle test cases ensure it upholds logic and gives the right output
- 
+Make the code strong enough to handle test cases ensure it upholds logic and gives the right output.
+Keep the import statements same.
+Maintain the logic in the code don't try to write new codes from scratch.
 
 Code:
 {code}
@@ -149,3 +182,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
