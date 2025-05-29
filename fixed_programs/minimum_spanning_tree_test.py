@@ -1,26 +1,74 @@
 from collections import defaultdict
 
-def minimum_spanning_tree(graph):
+def minimum_spanning_tree(edges):
     """
-    Finds the minimum spanning tree of a graph using Kruskal's algorithm.
+    Finds the minimum spanning tree of a graph represented by a dictionary of edges.
 
     Args:
-        graph: A dictionary where keys are tuples representing edges (u, v)
-               and values are the corresponding edge weights.
+        edges: A dictionary where keys are tuples representing edges (u, v) and values are the edge weights.
 
     Returns:
         A set of tuples representing the edges in the minimum spanning tree.
     """
 
+    # Create a graph representation from the edges.
+    graph = defaultdict(list)
+    for (u, v), weight in edges.items():
+        graph[u].append(v)
+        graph[v].append(u)
+
+    # Find all unique nodes in the graph.
+    nodes = set()
+    for u, v in edges.keys():
+        nodes.add(u)
+        nodes.add(v)
+
+    # Initialize the minimum spanning tree and visited set.
     mst = set()
+    visited = set()
+
+    # Start with an arbitrary node.
+    start_node = next(iter(nodes))
+    visited.add(start_node)
+
+    # Create a list of available edges.
+    available_edges = []
+    for (u, v), weight in edges.items():
+        if u in visited and v in nodes and v not in visited:
+            available_edges.append(((u, v), weight))
+        elif v in visited and u in nodes and u not in visited:
+            available_edges.append(((u, v), weight))
+    
+    while len(visited) < len(nodes):
+        # Find the minimum weight edge that connects a visited node to an unvisited node.
+        min_edge = None
+        min_weight = float('inf')
+
+        for (u, v), weight in edges.items():
+          if (u in visited and v in nodes and v not in visited) or (v in visited and u in nodes and u not in visited):
+            if weight < min_weight:
+              min_weight = weight
+              min_edge = (u, v) if u < v else (v,u) #always ensure u < v for consistency
+
+        if min_edge is None:
+          break #Graph might be disconnected.
+
+        # Add the minimum weight edge to the MST and mark the new node as visited.
+        u, v = min_edge
+        mst.add((u, v))
+        if u in visited:
+            visited.add(v)
+        else:
+            visited.add(u)
+        
+    #Kruskal's Algorithm.
     parent = {}
     rank = {}
 
     def find(i):
         if parent[i] == i:
             return i
-        parent[i] = find(parent[i])
-        return parent[i]
+        return find(parent[i])
 
     def union(i, j):
         root_i = find(i)
@@ -36,21 +84,17 @@ def minimum_spanning_tree(graph):
             return True
         return False
 
-    edges = sorted(graph.items(), key=lambda item: item[1])
+    mst = set()
+    
+    for node in nodes:
+        parent[node] = node
+        rank[node] = 0
 
-    vertices = set()
-    for edge in graph:
-        vertices.add(edge[0])
-        vertices.add(edge[1])
+    sorted_edges = sorted(edges.items(), key=lambda item: item[1])
 
-    for vertex in vertices:
-        parent[vertex] = vertex
-        rank[vertex] = 0
-
-    for edge, weight in edges:
-        u, v = edge
+    for (u, v), weight in sorted_edges:
         if union(u, v):
-            mst.add(edge)
+            mst.add((u, v))
 
     return mst
 

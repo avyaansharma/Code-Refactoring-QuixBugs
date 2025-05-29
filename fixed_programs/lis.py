@@ -21,16 +21,16 @@ def lis(arr):
         return 0
 
     tails = []  # Store the smallest tail of all increasing subsequences with length i+1 in tails[i].
-    predecessors = {}  # Store the predecessor of each element in the longest increasing subsequence.
+    predecessors = {}  # Store the predecessor of each element in the LIS.
 
     for number in arr:
-        # If number is greater than all tails, extend the longest subsequence by one.
         if not tails or number > tails[-1]:
+            # Extend the longest increasing subsequence.
             if tails:
                 predecessors[number] = tails[-1]
             tails.append(number)
         else:
-            # Find the smallest tail that is greater than or equal to the current number.
+            # Find the first tail that is greater than or equal to number
             l, r = 0, len(tails) - 1
             while l <= r:
                 mid = (l + r) // 2
@@ -39,7 +39,7 @@ def lis(arr):
                 else:
                     r = mid - 1
 
-            # Update the tail with the current number, as it can potentially lead to a longer subsequence.
+            # Update the tail
             if l > 0:
                 predecessors[number] = tails[l - 1]
             tails[l] = number

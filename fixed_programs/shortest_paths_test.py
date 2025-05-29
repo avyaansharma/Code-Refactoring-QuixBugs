@@ -1,41 +1,40 @@
 from collections import defaultdict
-import heapq
 
 def shortest_paths(start, graph):
     """
-    Finds the shortest paths from a starting node to all other nodes in a graph.
+    Compute shortest paths from start node to all other nodes in the graph.
 
     Args:
         start: The starting node.
         graph: A dictionary representing the graph where keys are tuples of (node1, node2)
-               representing an edge, and values are the weights of the edges.
+               representing an edge, and values are the edge weights.
 
     Returns:
-        A dictionary where keys are nodes and values are the shortest distances from the
-        starting node to that node.
+        A dictionary where keys are nodes and values are the shortest path distances
+        from the start node.  Returns None if a negative cycle is detected.
     """
 
     distances = defaultdict(lambda: float('inf'))
     distances[start] = 0
-    pq = [(0, start)]  # Priority queue of (distance, node)
 
-    while pq:
-        dist, u = heapq.heappop(pq)
+    nodes = set()
+    for u, v in graph:
+        nodes.add(u)
+        nodes.add(v)
+    
+    # Bellman-Ford Algorithm
+    for _ in range(len(nodes) - 1):
+        for (u, v), weight in graph.items():
+            if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+                distances[v] = distances[u] + weight
 
-        if dist > distances[u]:
-            continue  # Skip if we've already found a shorter path to u
+    # Check for negative cycles
+    for (u, v), weight in graph.items():
+        if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+            return None  # Negative cycle detected
 
-        for edge, weight in graph.items():
-            if edge[0] == u:
-                v = edge[1]
-                if distances[v] > distances[u] + weight:
-                    distances[v] = distances[u] + weight
-                    heapq.heappush(pq, (distances[v], v))
+    return dict(distances)
 
-    return distances
-"""
-Test shortest paths
-""" 
 def main():
     # Case 1: Graph with multiple paths
     # Output: {'A': 0, 'C': 3, 'B': 1, 'E': 5, 'D': 10, 'F': 4}

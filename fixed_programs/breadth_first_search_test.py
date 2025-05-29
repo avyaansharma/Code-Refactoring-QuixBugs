@@ -1,5 +1,42 @@
-from node import Node
-from breadth_first_search import breadth_first_search
+from collections import deque
+
+class Node:
+    def __init__(self, name, visited = False, successors = []):
+        self.name = name
+        self.visited = visited
+        self.successors = successors
+
+    def __str__(self):
+        return self.name
+
+def breadth_first_search(start_node, target_node):
+    """
+    Performs a breadth-first search to find a path from a start node to a target node.
+
+    Args:
+        start_node: The node to start the search from.
+        target_node: The node to search for.
+
+    Returns:
+        True if a path is found, False otherwise.
+    """
+    if start_node is target_node:
+        return True
+
+    queue = deque([start_node])
+    visited = {start_node}
+
+    while queue:
+        node = queue.popleft()
+
+        for neighbor in node.successors:
+            if neighbor is target_node:
+                return True
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+
+    return False
 
  
 """
@@ -9,11 +46,11 @@ def main():
     # Case 1: Strongly connected graph
     # Output: Path found!
     station1 = Node("Westminster")
-    station2 = Node("Waterloo", [station1])
-    station3 = Node("Trafalgar Square", [station1, station2])
-    station4 = Node("Canary Wharf",  [station2, station3])
-    station5 = Node("London Bridge",  [station4, station3])
-    station6 = Node("Tottenham Court Road",  [station5, station4])
+    station2 = Node("Waterloo", None, [station1])
+    station3 = Node("Trafalgar Square", None, [station1, station2])
+    station4 = Node("Canary Wharf",  None, [station2, station3])
+    station5 = Node("London Bridge",  None, [station4, station3])
+    station6 = Node("Tottenham Court Road",  None, [station5, station4])
 
     if breadth_first_search(station6, station1):
         print("Path found!", end=" ")
@@ -26,9 +63,9 @@ def main():
     nodef =  Node("F")
     nodee =  Node("E")
     noded =  Node("D")
-    nodec =  Node("C", [nodef])
-    nodeb =  Node("B", [nodee])
-    nodea =  Node("A", [nodeb, nodec, noded])
+    nodec =  Node("C", None, [nodef])
+    nodeb =  Node("B", None, [nodee])
+    nodea =  Node("A", None, [nodeb, nodec, noded])
 
     if breadth_first_search(nodea, nodee):
         print("Path found!", end=" ")
@@ -57,9 +94,9 @@ def main():
     node1 = Node("1")
     node2 = Node("2")
     node3 = Node("3")
-    node4 = Node("4", [node1])
-    node5 = Node("5", [node2])
-    node6 = Node("6", [node5, node4, node3])
+    node4 = Node("4", None, [node1])
+    node5 = Node("5", None, [node2])
+    node6 = Node("6", None, [node5, node4, node3])
 
     node2.successors = [node6]
 

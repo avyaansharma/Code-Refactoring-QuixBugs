@@ -17,19 +17,18 @@ def kth(arr, k):
     if not arr:
         return None  # Handle empty array case
 
-    if k < 0 or k >= len(arr):
-        return None  # Handle invalid k
-
     pivot = arr[0]
     below = [x for x in arr[1:] if x < pivot]
     above = [x for x in arr[1:] if x > pivot]
-    equal = [x for x in arr if x == pivot]  # Handle duplicate pivots
+    equal = [x for x in arr[1:] if x == pivot]
+    
+    num_less = len(below)
+    num_equal = len(equal)
+    
 
-    num_below = len(below)
-
-    if k < num_below:
+    if k < num_less:
         return kth(below, k)
-    elif k < num_below + len(equal):
-        return pivot  # kth element is one of the pivots
+    elif k < num_less + num_equal + 1:  # Correct condition for equal values
+        return pivot
     else:
-        return kth(above, k - num_below - len(equal))
+        return kth(above, k - num_less - num_equal - 1) # Correct k value

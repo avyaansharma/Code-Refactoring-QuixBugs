@@ -1,22 +1,11 @@
 def hanoi(height, start=1, end=3):
     steps = []
-    if not isinstance(height, int):
-        raise TypeError("Height must be an integer.")
-    if height < 0:
-        return []  # Handle negative height as an empty problem
-    if start not in (1, 2, 3):
-        raise ValueError("Start peg must be 1, 2, or 3.")
-    if end not in (1, 2, 3):
-        raise ValueError("End peg must be 1, 2, or 3.")
-    if start == end:
-        return []  # No moves needed if start and end are the same
-
     if height > 0:
         helper = ({1, 2, 3} - {start} - {end}).pop()
         steps.extend(hanoi(height - 1, start, helper))
-        steps.append((start, end))  # Corrected move
+        steps.append((start, end))
         steps.extend(hanoi(height - 1, helper, end))
-
+ 
     return steps
 
 

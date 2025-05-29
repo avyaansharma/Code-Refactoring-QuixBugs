@@ -1,32 +1,31 @@
 def depth_first_search(startnode, goalnode):
-    """
-    Depth-first Search
-
-    Input:
-        startnode: A digraph node
-        goalnode: A digraph node
-
-    Output:
-        Whether goalnode is reachable from startnode
-    """
     nodesvisited = set()
-
+ 
     def search_from(node):
-        if node is None:
-            return False  # Handle None node case
         if node in nodesvisited:
             return False
-        if node == goalnode:
+        
+        nodesvisited.add(node)
+        if node is goalnode:
             return True
-        nodesvisited.add(node)  # Mark node as visited *before* exploring successors
-        if hasattr(node, 'successors'): # Check if node has successors attribute
-            if node.successors is None:
-                return False
-            return any(search_from(nextnode) for nextnode in node.successors)
         else:
-            return False # Node does not have successor so not reachable
-
-    if startnode is None or goalnode is None:
-        return False
+            for nextnode in node.successors:
+                if search_from(nextnode):
+                    return True
+            return False
 
     return search_from(startnode)
+
+
+
+"""
+Depth-first Search
+
+
+Input:
+    startnode: A digraph node
+    goalnode: A digraph node
+
+Output:
+    Whether goalnode is reachable from startnode
+"""

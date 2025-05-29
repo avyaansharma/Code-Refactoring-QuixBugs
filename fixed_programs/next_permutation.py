@@ -1,33 +1,39 @@
 def next_permutation(perm):
     """
-    Finds the next lexicographically greater permutation of a list of integers.
+    Next Permutation
 
-    Args:
-        perm: A list of integers.
+    Input:
+        perm: A list of ints
 
-    Returns:
-        The next permutation of the input list, or None if the input is already the last permutation.
+    Output:
+        The lexicographically next permutation of the elements of perm.
+        Returns None if the input is already the last permutation or invalid.
+
+    Example:
+        >>> next_permutation([3, 2, 4, 1])
+        [3, 4, 1, 2]
     """
-    n = len(perm)
-    if n <= 1:
-        return None  # No next permutation for single or empty lists
+    if not perm or len(perm) <= 1:
+        return None  # No next permutation for empty or single-element list
 
     # Find the first decreasing element from the right
-    i = n - 2
+    i = len(perm) - 2
     while i >= 0 and perm[i] >= perm[i + 1]:
         i -= 1
 
     if i < 0:
-        return None # Array is in descending order (last permutation)
+        return None  # Already the last permutation
 
     # Find the smallest element to the right of i that is greater than perm[i]
-    j = n - 1
+    j = len(perm) - 1
     while j > i and perm[j] <= perm[i]:
         j -= 1
 
     # Swap perm[i] and perm[j]
+    perm = list(perm) # create mutable list
     perm[i], perm[j] = perm[j], perm[i]
 
     # Reverse the sublist to the right of i
     perm[i + 1:] = reversed(perm[i + 1:])
-    return list(perm)
+
+    return perm

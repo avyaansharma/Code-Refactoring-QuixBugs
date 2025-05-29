@@ -2,56 +2,59 @@ from collections import defaultdict
 import heapq
 
 class Node:
-    def __init__(self, val, left=None, right=None):
-        self.val = val
-        self.left = left
-        self.right = right
+    def __init__(self, name, parent=None, children=None):
+        self.name = name
+        self.parent = parent
+        self.children = children if children is not None else []
 
     def __repr__(self):
-        return f"Node({self.val})"
+        return f"Node({self.name})"
 
-def shortest_path_length(length_by_edge, start, end):
+INT_MAX = float('inf')
+
+def shortest_path_length(length_by_edge, start_node, end_node):
     """
-    Find the shortest path length between two nodes in a graph.
+    Calculate the shortest path length between two nodes in a graph.
 
     Args:
-        length_by_edge (dict): A dictionary where keys are tuples of nodes
-                              representing edges and values are the lengths of
-                              the edges.
-        start (Node): The starting node.
-        end (Node): The ending node.
+        length_by_edge (dict): A dictionary where keys are tuples of nodes representing edges,
+                                and values are the lengths of those edges.
+        start_node (Node): The starting node.
+        end_node (Node): The destination node.
 
     Returns:
-        int: The shortest path length between the start and end nodes.
-             Returns float('inf') if no path exists.
+        int: The shortest path length, or INT_MAX if no path exists.
     """
 
+    if start_node == end_node:
+        return 0
+
+    # Build the graph as an adjacency list
     graph = defaultdict(list)
     for (u, v), weight in length_by_edge.items():
         graph[u].append((v, weight))
 
-    distances = {node: float('inf') for node in graph}
-    distances[start] = 0
+    # Initialize distances with infinity for all nodes except the start node
+    distances = {node: INT_MAX for node in graph}
+    distances[start_node] = 0
 
-    pq = [(0, start)]  # Priority queue: (distance, node)
+    # Use Dijkstra's algorithm to find the shortest path
+    priority_queue = [(0, start_node)]  # (distance, node)
 
-    while pq:
-        dist, u = heapq.heappop(pq)
+    while priority_queue:
+        dist, current_node = heapq.heappop(priority_queue)
 
-        if dist > distances[u]:
+        if dist > distances[current_node]:
             continue
 
-        if u == end:
-            return dist
+        for neighbor, weight in graph[current_node]:
+            new_dist = distances[current_node] + weight
+            if new_dist < distances[neighbor]:
+                distances[neighbor] = new_dist
+                heapq.heappush(priority_queue, (new_dist, neighbor))
 
-        for v, weight in graph[u]:
-            if distances[v] > distances[u] + weight:
-                distances[v] = distances[u] + weight
-                heapq.heappush(pq, (distances[v], v))
-
-    return float('inf')
-
-
+    # Return the shortest distance to the end node, or INT_MAX if unreachable
+    return distances.get(end_node, INT_MAX)
 def main():
  
     node1 = Node("1")
@@ -87,7 +90,6 @@ def main():
     print(result)
 
     # Case 4: Unreachable path
-    # Output: INT_MAX
     result = shortest_path_length(length_by_edge, node1, node5)
     print(result)
 
