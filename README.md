@@ -5,6 +5,10 @@ The following benchmark consists of 40 programs from the Quixey Challenge transl
 # Background: Quixey Challenge
 From 2011 to 2013, mobile app search startup Quixey ran a challenge in which programmers were given an implementation of a classic algorithm with a bug on a single line, and had one minute to supply a fix. Success entailed $100 and a possible interview. These programs were developed as challenges for humans by people unaware of program repair.
 
+**# My Performance**
+Have achieved an accuracy of 39/41 files and in testcases 268/278(2 were skipped by test by default)
+
+
 # Usage
 
 All Python is written in Python3.
